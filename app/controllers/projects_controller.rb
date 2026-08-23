@@ -11,10 +11,12 @@ class ProjectsController < ApplicationController
 
   def new
     @project = Project.new
+    authorize @project
   end
 
   def create
     @project = current_user.owned_projects.build(project_params)
+    authorize @project
 
     if @project.save
       redirect_to @project, notice: "Project created successfully."
@@ -29,7 +31,7 @@ class ProjectsController < ApplicationController
   end
 
   def update
-    @project = Project.find(param[:id])
+    @project = Project.find(params[:id])
     authorize @project
 
     if @project.update(project_params)
