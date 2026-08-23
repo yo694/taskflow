@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Taskflow</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+
+    <nav>
+      <% if user_signed_in? %>
+        <%= link_to "Projects", projects_path %>
+        <%= link_to "Edit Profile", edit_user_registration_path %>
+        <%= button_to "Sign Out",
+                      destroy_user_session_path,
+                      method: :delete,
+                      data: { turbo: false } %>
+      <% else %>
+        <%= link_to "Sign In", new_user_session_path %>
+        <%= link_to "Sign Up", new_user_registration_path %>
+        <%= link_to "Forgot Password?",
+                    new_user_password_path %>
+      <% end %>
+    </nav>
+
+    <% if flash[:notice] %>
+      <p><%= flash[:notice] %></p>
+    <% end %>
+
+    <% if flash[:alert] %>
+      <p><%= flash[:alert] %></p>
+    <% end %>
+
+    <%= yield %>
+
+  </body>
+</html>

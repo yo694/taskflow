@@ -1,0 +1,33 @@
+<%= form_with model: task do |form| %>
+
+  <%= render "shared/error_messages", object: task %>
+
+  <div>
+    <%= form.label :title %>
+    <%= form.text_field :title %>
+  </div>
+
+  <div>
+    <%= form.label :status %>
+    <%= form.select :status, Task.statuses.keys %>
+  </div>
+
+  <div>
+    <%= form.label :due_on %>
+    <%= form.date_field :due_on %>
+  </div>
+
+  <div>
+    <%= form.label :assignee_id %>
+    <%= form.collection_select :assignee_id,
+                               @project.members,
+                               :id,
+                               :email,
+                               include_blank: true %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+
+<% end %>

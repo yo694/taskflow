@@ -1,0 +1,23 @@
+<h1><%= @project.name %></h1>
+
+<p><%= @project.description %></p>
+
+<p>
+  Owner:
+  <%= @project.owner.email %>
+</p>
+
+<%= link_to "Edit", edit_project_path(@project) %>
+
+<%= link_to "Back", projects_path %>
+
+<%= button_to "Delete",
+              @project,
+              method: :delete,
+              data: { turbo_confirm: "Are you sure?" } %>
+
+<h2>Tasks</h2>
+
+<%= render @project.tasks %>
+
+<%= link_to "New Task", new_project_task_path(@project) %>

@@ -1,0 +1,22 @@
+<div>
+  <h3>
+    <%= link_to task.title, task_path(task) %>
+  </h3>
+
+  <p>Status: <%= task.status %></p>
+
+  <% if task.due_on.present? %>
+    <p>Due: <%= task.due_on %></p>
+  <% end %>
+
+  <% if task.assignee.present? %>
+    <p>Assignee: <%= task.assignee.email %></p>
+  <% end %>
+
+  <%= link_to "Edit", edit_task_path(task) %>
+
+  <%= button_to "Delete",
+                task_path(task),
+                method: :delete,
+                data: { turbo_confirm: "Are you sure?" } %>
+</div>

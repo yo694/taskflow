@@ -1,0 +1,19 @@
+<%= form_with model: project do |form| %>
+
+  <%= render "shared/error_messages", object: project %>
+
+  <div>
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div>
+    <%= form.label :description %>
+    <%= form.text_area :description %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+
+<% end %>
