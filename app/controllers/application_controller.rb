@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
-  after_action :verify_authorized, unless: :devise_controller?
+  after_action :verify_authorized, unless: :skip_pundit_authorization_verification?
   after_action :verify_policy_scoped, if: :verify_policy_scope?
 
   private
@@ -20,4 +20,9 @@ class ApplicationController < ActionController::Base
   def verify_policy_scope?
     action_name == "index" && !devise_controller?
   end
+
+  def skip_pundit_authorization_verification?
+    devise_controller? || action_name == "index"
+  end 
+  
 end
