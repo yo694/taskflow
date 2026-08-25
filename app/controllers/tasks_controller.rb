@@ -21,7 +21,7 @@ class TasksController < ApplicationController
 
   def create
     @project = Project.find(params[:project_id])
-    @task = @project.tasks.build(task_parms)
+    @task = @project.tasks.build(task_params)
     authorize @task
 
     if @task.save
@@ -60,7 +60,7 @@ class TasksController < ApplicationController
 
   private 
 
-  def task_parms
+  def task_params
     params.require(:task).permit(:title,:status, :due_on, :assignee_id)
   end 
   

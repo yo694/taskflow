@@ -1,10 +1,10 @@
 FactoryBot.define do
   factory :task do
-    project { nil }
-    assignee { nil }
+    association :project
+    association :assignee, factory: :user
     title { "MyString" }
-    status { 1 }
-    due_on { "2026-08-21" }
-    completed_at { "2026-08-21 07:02:58" }
+    status { :todo }
+    due_on { Date.current }
+    completed_at { nil }
   end
 end

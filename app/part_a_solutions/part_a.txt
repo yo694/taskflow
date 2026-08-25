@@ -1,0 +1,150 @@
+A1. Routing & Request Lifecycle
+
+1. Admin projects index:
+-GET /admin/projects
+- Admin::ProjectsController#index
+
+2. Destroy task 42:
+-DELETE /tasks/42
+- TasksController#destroy
+
+3. Create comment on task 42:
+-POST /tasks/42/comments
+- CommentsController#create
+
+Request lifecycle for POST /projects/3/tasks:
+
+-Browser
+-Router
+-Controller/action
+- before_action
+- Controller action executes
+- Render view
+- HTML response
+- Browser
+
+--------------------------------------------------------------------
+A2. N+1 Queries & Eager Loading
+
+(a) For 50 projects:
+
+Project.all = 1 query
+project.tasks.count = 50 queries
+project.owner.name = 50 queries
+
+Total = 101 SQL queries.
+
+Reason - Rails loads the tasks and owner separately for each project.
+
+(b)1 Eager Loading:
+
+@projects = Project.includes(:tasks, :owner)
+
+This loads the associations in advance and avoids repeated queries.
+
+(b)2 Counter Cache:
+
+Use the tasks_count column on projects:
+
+project.tasks_count
+
+This avoids running project.tasks.count for every project.
+
+---------------------------------------------------------------------------------
+A3. Callbacks & Dirty Tracking
+
+Task starts as- status = "todo"
+                                      completed_at = nil
+
+Then - t.status = "done"
+
+First output - true
+
+Reason - completed_at is still nil because we have not saved yet.
+
+After - t.save!
+
+Second output - false
+
+Reason - the callback sees the status changed to "done" and sets completed_at.
+
+Then - t.save!
+
+Third output - false
+
+Reason: status did not change again. It is still "done", so the callback does not run for a status change.
+
+---------------------------------------------------------------------------------------------------------
+
+A4. Mass Assignment & Strong Parameters
+
+Vulnerability- Mass assignment vulnerability.
+
+Problem - permit! allows the user to send and modify any Task attributes.
+
+A malicious user could send - 
+
+task[project_id] = another_project_id
+or
+task[assignee_id] = another_user_id
+
+Fix- 
+
+params.require(:task).permit(
+:title,
+:status,
+:due_on,
+:assignee_id
+)
+
+Never permit  :project_id because the project should come from the current project/route.
+
+-------------------------------------------------------------------------------------------------
+A5. Authentication vs Authorization
+
+(a)
+Devise = Authentication.
+
+It checks - Who are you?
+
+Pundit = Authorization.
+
+It checks - Are you allowed to do this?
+
+(b)
+The given code is wrong because Project has no "user" attribute.
+
+Correct code:
+
+def update?
+record.project.owner == user ||
+record.project.members.include?(user)
+end
+--------------------------------------------------------------------------
+
+A6. Security: SQL Injection, XSS & CSRF
+
+(a) SQL Injection
+
+Problem - User input is directly added to SQL.
+
+Wrong - Project.where("name = '#{params[:name]}'")
+Fix - Project.where(name: params[:name])
+
+(b) XSS (Cross-Site Scripting)
+
+Problem - raw allows unsafe HTML/JavaScript to be displayed.
+
+Wrong - <p><%= raw @task.description %></p>
+Fix - <p><%= @task.description %></p>
+
+(c) CSRF
+
+Don't use - protect_from_forgery with: :exception
+Use - protect_from_forgery with: :null_session
+
+Reason - API clients may not send a browser CSRF token.
+
+Trade-off - The API request does not get normal CSRF protection.
+
+----------------------------------------------------------------------------------
